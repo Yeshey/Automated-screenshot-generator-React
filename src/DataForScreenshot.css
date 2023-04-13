@@ -1,27 +1,12 @@
 .data-for-screenshot {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
   background-color: #fff;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin: 5px auto;
-  width: 50%;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.input-group input {
-  flex: 1;
-  margin-right: 10px;
-  max-width: 50%;
-}
-
-.form-group label {
-  margin-bottom: 5px;
-}
-
-.input-group {
-  display: flex;
-}
-
-.input-group input {
-  flex: 1;
-  margin-right: 10px;
+.input-api-key {
+  max-width: 150px;
 }

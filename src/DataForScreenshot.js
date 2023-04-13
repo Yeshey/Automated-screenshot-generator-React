@@ -6,12 +6,14 @@ function DataForScreenshot() {
   return (
     <div className="data-for-screenshot">
         <div className="form-group">
-        <label htmlFor="api-key">
-          <span style={{paddingLeft: '5px'}}>API key:</span>
-          <QuestionMark text="Please enter your API from screenshotmachine.com" />
-        </label>
           <div className="input-group">
-            <input type="text" id="api-key" name="api-key" />
+            <label htmlFor="api-key">
+              <span>API key:</span>
+              <QuestionMark text="Please enter your API from screenshotmachine.com" />
+            </label>
+            <input className="input-api-key" type="text" id="api-key" name="api-key" />
+          </div>
+          <div className="input-group">
             <button type="button" onClick={signIn}>Sign In</button>
           </div>
         </div>
