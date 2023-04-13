@@ -1,0 +1,27 @@
+.data-for-screenshot {
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 5px auto;
+  width: 50%;
+}
+
+.input-group input {
+  flex: 1;
+  margin-right: 10px;
+  max-width: 50%;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+}
+
+.input-group {
+  display: flex;
+}
+
+.input-group input {
+  flex: 1;
+  margin-right: 10px;
+}
