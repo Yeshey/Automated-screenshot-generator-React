@@ -48,3 +48,10 @@ button {
 button:hover {
   background-color: #1a73e8;
 }
+
+.screenshot-image {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}

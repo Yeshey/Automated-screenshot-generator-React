@@ -1,9 +1,9 @@
 import React from "react";
-import QuestionMark from "./QuestionMark"; // import the Overlay component
-import GoogleAuth from "./GoogleAuth"; // import the Overlay component
+import QuestionMark from "./QuestionMark";
+import GoogleAuth from "./GoogleAuth";
 import "./DataForScreenshot.css";
 
-function DataForScreenshot() {
+function DataForScreenshot(props) {
   return (
     <div className="data-for-screenshot">
         <div className="form-group">
@@ -12,7 +12,7 @@ function DataForScreenshot() {
               <span>API key:</span>
               <QuestionMark text="Please enter your API from screenshotmachine.com" />
             </label>
-            <input className="input-api-key" type="text" id="api-key" name="api-key" placeholder="7e4650" />
+            <input className="input-api-key" type="text" id="api-key" name="api-key" placeholder="7e4650" onChange={props.onApiKeyChange} />
           </div>
           <GoogleAuth />
         </div>
