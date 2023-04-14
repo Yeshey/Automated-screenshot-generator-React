@@ -1,5 +1,6 @@
 import React from "react";
 import QuestionMark from "./QuestionMark"; // import the Overlay component
+import GoogleAuth from "./GoogleAuth"; // import the Overlay component
 import "./DataForScreenshot.css";
 
 function DataForScreenshot() {
@@ -11,18 +12,12 @@ function DataForScreenshot() {
               <span>API key:</span>
               <QuestionMark text="Please enter your API from screenshotmachine.com" />
             </label>
-            <input className="input-api-key" type="text" id="api-key" name="api-key" />
+            <input className="input-api-key" type="text" id="api-key" name="api-key" placeholder="7e4650" />
           </div>
-          <div className="input-group">
-            <button type="button" onClick={signIn}>Sign In</button>
-          </div>
+          <GoogleAuth />
         </div>
     </div>
   );
-}
-
-function signIn() {
-  // Your code for signing in to Google Drive goes here
 }
 
 export default DataForScreenshot;
