@@ -3,7 +3,7 @@ import { GoogleLogout } from 'react-google-login';
 
 const clientId = "191000969607-0cgqepb1p3act7mm5bnbqm8mcl0tafbg.apps.googleusercontent.com"
 
-function Login(){
+function Logout(){
     const onSuccess = (res) => {
         console.log("Logout successful! ");
     }
@@ -18,3 +18,5 @@ function Login(){
         </div>
     )
 }
+
+export default Logout
