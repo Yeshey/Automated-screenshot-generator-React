@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { GoogleOAuthProvider, GoogleLogin, googleLogout, useGoogleOneTapLogin } from '@react-oauth/google';
+import LoginButton from "./components/login"
+import LogoutButton from "./components/logout"
+
+// following this video https://www.youtube.com/watch?v=0KoZSVnTnkA
 
 const CLIENT_ID = "191000969607-0cgqepb1p3act7mm5bnbqm8mcl0tafbg.apps.googleusercontent.com"
 const CLIENT_SECRET = "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"
