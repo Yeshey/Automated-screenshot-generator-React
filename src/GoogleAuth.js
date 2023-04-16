@@ -1,7 +1,5 @@
-const fs = require('fs')
 import React, { useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
-import { flushSync } from "react-dom";
 
 
 const CLIENT_ID = "191000969607-0cgqepb1p3act7mm5bnbqm8mcl0tafbg.apps.googleusercontent.com"
@@ -64,7 +62,7 @@ function GoogleAuth() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenResponse.access_token}`
               },
-              body: JSON.stringify({"name": fs.createReadStream("/Automated-screenshot-generator/AutoCooper Codes File"), "mimeType":"text/plain"})
+              body: JSON.stringify({"name": "Cooper Codes File", "mimeType":"text/plain"})
             });
           }
 
