@@ -9,5 +9,6 @@ pkgs.stdenv.mkDerivation {
     nodePackages.create-react-app
     nodejs
     yarn
+    
   ];
 }
