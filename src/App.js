@@ -12,6 +12,28 @@ function App() {
   const [imageUrl, setImageUrl] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
+  const [links, setLinks] = useState([]);
+
+  const handleAddLink = (link) => {
+    setLinks([...links, link]);
+  };
+
+  const renderLinks = () => {
+    if (links.length === 0) {
+      return null;
+    }
+
+    return (
+      <div>
+        <h2>Links:</h2>
+        <ul>
+          {links.map((link, index) => (
+            <li key={index}>{link}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
 
   function takeScreenshot() {
     const url = document.getElementById("link-input").value;
@@ -46,6 +68,7 @@ function App() {
   }
 
   function uploadImage(accessToken, folderId) {
+    console.log(siteUrl)
     const url = new URL(siteUrl);
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
@@ -77,6 +100,7 @@ function App() {
           .then((data) => {
             console.log("Image uploaded with ID:", data.id);
             console.log("Shareable link:", data.webViewLink);
+            handleAddLink(data.webViewLink);
           })
           .catch((error) => console.error("Error uploading image:", error));
       })
@@ -153,6 +177,7 @@ function App() {
         <button type="button" onClick={takeScreenshot}>Take Screenshot</button>
         <button type="button" onClick={createDriveFile}>Upload to Google Drive and Share</button>
       </form>
+      {renderLinks()}
       {imageUrl && <img className="screenshot-image" src={imageUrl} alt="Screenshot" />}
     </div>
   );
