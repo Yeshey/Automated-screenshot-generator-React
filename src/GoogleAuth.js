@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from "react";
-import jwt_decode from "jwt-decode";
-
 
 const CLIENT_ID = "191000969607-0cgqepb1p3act7mm5bnbqm8mcl0tafbg.apps.googleusercontent.com"
-const CLIENT_SECRET = "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"
-const API_KEY = "AIzaSyCEDoKs0VmaiLNWbG0B6aFIiKcBOak90Is"
 const SCOPES = "https://www.googleapis.com/auth/drive";
 
 function GoogleAuth() {
-
-  const [user, setUser] = useState({});
   const [tokenClient, setTokenClient] = useState({});
-
-  function handleCallbackResponse(response){
-    console.log("Encoded JWT ID token: " + response.credential);
-    var userObject = jwt_decode(response.credential);
-    console.log(userObject);
-    setUser(userObject)
-  }
 
   function createDriveFile() { 
     tokenClient.requestAccessToken();
@@ -59,11 +46,6 @@ function GoogleAuth() {
   useEffect(() => {
     /* global google */
     // const google = window.google; 
-    google.accounts.id.initialize({
-      client_id: CLIENT_ID,
-      callback: handleCallbackResponse
-    });
-
     
     // Access Tokens
     // Upload to a specific users google drive
@@ -115,12 +97,7 @@ function GoogleAuth() {
         }
       })
     );
-    
-      // tokenClient.requestAccessToken();
 
-
-    // should ask as soon as site opens
-    google.accounts.id.prompt()
   }, []);
 
   // If no user: show sign in button
@@ -129,11 +106,9 @@ function GoogleAuth() {
     <>
     <div className="App">
 
-      { user &&
-        <div>
-          <input type="submit" onClick={createDriveFile} value="Create File" />
-        </div>
-      }
+      <div>
+        <input type="submit" onClick={createDriveFile} value="Create File" />
+      </div>
     </div>
     </>
   );
