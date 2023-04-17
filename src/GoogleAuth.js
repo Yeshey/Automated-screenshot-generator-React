@@ -51,24 +51,45 @@ function GoogleAuth() {
         client_id: CLIENT_ID,
         scope: SCOPES,
         callback: (tokenResponse) => {
-        console.log(tokenResponse);
+          console.log(tokenResponse);
           // We now have access to a live token to use for ANY google API
           if (tokenResponse && tokenResponse.access_token) {
             // Google Drive API, we are talking to it with HTTP
-            // Create a file for a certain user
+            // Create a folder (if it doesn't exist) and upload a file to it
             fetch("https://www.googleapis.com/drive/v3/files", {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenResponse.access_token}`
               },
-              body: JSON.stringify({"name": "Cooper Codes File", "mimeType":"text/plain"})
+              body: JSON.stringify({
+                "name": "Automated-screenshot-generator",
+                "mimeType": "application/vnd.google-apps.folder"
+              })
+            })
+            .then(response => response.json())
+            .then(folder => {
+              const folderId = folder.id;
+              console.log(`Folder ID: ${folderId}`);
+    
+              fetch("https://www.googleapis.com/drive/v3/files", {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${tokenResponse.access_token}`
+                },
+                body: JSON.stringify({
+                  "name": "Cooper Codes File",
+                  "parents": [folderId],
+                  "mimeType":"text/plain"
+                })
+              });
             });
           }
-
         }
       })
     );
+    
       // tokenClient.requestAccessToken();
 
 
