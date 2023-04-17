@@ -71,7 +71,8 @@ function App() {
     console.log(siteUrl)
     const url = new URL(siteUrl);
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-    const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
+    //const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
+    const filename = `${id}_${siteUrl}.jpg`;
   
     // Fetch the image data
     fetch(imageUrl)
@@ -176,8 +177,8 @@ function App() {
         <input type="text" id="link-input" name="link-input" /><br />
         <button type="button" onClick={takeScreenshot}>Take Screenshot</button>
         <button type="button" onClick={createDriveFile}>Upload to Google Drive and Share</button>
+        {renderLinks()}
       </form>
-      {renderLinks()}
       {imageUrl && <img className="screenshot-image" src={imageUrl} alt="Screenshot" />}
     </div>
   );
