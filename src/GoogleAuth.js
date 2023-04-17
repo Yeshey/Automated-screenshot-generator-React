@@ -107,7 +107,7 @@ function GoogleAuth() {
     <div className="App">
 
       <div>
-        <input type="submit" onClick={createDriveFile} value="Create File" />
+        <button type="button" onClick={createDriveFile}>Create File</button>
       </div>
     </div>
     </>

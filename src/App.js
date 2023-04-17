@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DataForScreenshot from "./DataForScreenshot";
 import './App.css';
+
+const CLIENT_ID = "191000969607-0cgqepb1p3act7mm5bnbqm8mcl0tafbg.apps.googleusercontent.com"
+const SCOPES = "https://www.googleapis.com/auth/drive";
+
+const img_dimension = "1920x1080";
+const img_format = "JPG";
 
 function App() {
   const [imageUrl, setImageUrl] = useState("");
@@ -18,15 +24,120 @@ function App() {
     }
   
     const key = apiKey;
-    const dimension = "1920x1080";
-    const format = "JPG";
-    const apiUrl = `https://api.screenshotmachine.com?key=${key}&url=${url}&dimension=${dimension}&format=${format}`;
+    const apiUrl = `https://api.screenshotmachine.com?key=${key}&url=${url}&dimension=${img_dimension}&format=${img_format}`;
     setImageUrl(apiUrl);
   }
 
   function handleApiKeyChange(event) {
     setApiKey(event.target.value);
   }
+
+
+  const [tokenClient, setTokenClient] = useState({});
+
+  function createDriveFile() { 
+    // Check if imageUrl state variable is empty
+    if (!imageUrl) {
+      alert("No screenshot taken yet");
+      return;
+    }
+    tokenClient.requestAccessToken();
+  }
+
+function uploadImage(accessToken, folderId) {
+  const url = new URL(imageUrl);
+  const filename = `${url.hostname.replace(/\./g, "_")}.jpg`;
+
+  // Fetch the image data
+  fetch(imageUrl)
+    .then((response) => response.blob())
+    .then((imageBlob) => {
+      // Upload the image to the specified folder
+      const formData = new FormData();
+      formData.append("metadata", new Blob(
+        [
+          JSON.stringify({
+            "name": filename,
+            "parents": [folderId]
+          })
+        ],
+        { type: "application/json" }
+      ));
+      formData.append("file", imageBlob, filename);
+      fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: formData
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Image uploaded with ID:", data.id);
+        })
+        .catch((error) => console.error("Error uploading image:", error));
+    })
+    .catch((error) => console.error("Error fetching image:", error));
+}
+
+  
+
+  useEffect(() => {
+    /* global google */
+    // const google = window.google; 
+    
+    // Access Tokens
+    // Upload to a specific users google drive
+
+    // tokenClient
+    setTokenClient(
+      google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: (tokenResponse) => {
+          console.log(tokenResponse);
+          // We now have access to a live token to use for ANY google API
+          if (tokenResponse && tokenResponse.access_token) {
+            // Check if the target folder exists
+            fetch(`https://www.googleapis.com/drive/v3/files?q=name='Automated-screenshot-generator'&mimeType='application/vnd.google-apps.folder'&access_token=${tokenResponse.access_token}`)
+              .then((response) => response.json())
+              .then((data) => {
+                let folderId = null;
+                if (data.files.length === 0) {
+                  // Folder does not exist, so create it first
+                  fetch("https://www.googleapis.com/drive/v3/files", {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${tokenResponse.access_token}`
+                    },
+                    body: JSON.stringify({
+                      "name": "Automated-screenshot-generator",
+                      "mimeType": "application/vnd.google-apps.folder"
+                    })
+                  })
+                    .then((response) => response.json())
+                    .then((data) => {
+                      folderId = data.id;
+                      console.log("Folder created with ID:", folderId);
+                      // Upload the image to the newly created folder
+                      uploadImage(tokenResponse.access_token, folderId);
+                    })
+                    .catch((error) => console.error("Error creating folder:", error));
+                } else {
+                  // Folder exists, so use its ID to upload the image
+                  folderId = data.files[0].id;
+                  console.log("Folder exists with ID:", folderId);
+                  uploadImage(tokenResponse.access_token, folderId);
+                }
+              })
+              .catch((error) => console.error("Error searching for folder:", error));
+          }
+        }
+      })
+    );
+
+  }, []);
 
   return (
     <div>
@@ -36,6 +147,7 @@ function App() {
         <label htmlFor="link-input">Enter website URL:</label>
         <input type="text" id="link-input" name="link-input" /><br />
         <button type="button" onClick={takeScreenshot}>Take Screenshot</button>
+        <button type="button" onClick={createDriveFile}>Upload to Google Drive and Share</button>
       </form>
       {imageUrl && <img className="screenshot-image" src={imageUrl} alt="Screenshot" />}
     </div>
