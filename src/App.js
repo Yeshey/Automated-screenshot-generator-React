@@ -15,7 +15,7 @@ function App() {
   const [links, setLinks] = useState([]);
 
   const handleAddLink = (link) => {
-    setLinks([...links, link]);
+    setLinks((prevLinks) => [...prevLinks, link]);
   };
 
   const renderLinks = () => {
@@ -69,7 +69,7 @@ function App() {
 
   function uploadImage(accessToken, folderId) {
     console.log(siteUrl)
-    const url = new URL(siteUrl);
+    //const url = new URL(siteUrl);
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     //const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
     const filename = `${id}_${siteUrl}.jpg`;
@@ -102,6 +102,7 @@ function App() {
             console.log("Image uploaded with ID:", data.id);
             console.log("Shareable link:", data.webViewLink);
             handleAddLink(data.webViewLink);
+            console.log(links)
           })
           .catch((error) => console.error("Error uploading image:", error));
       })
