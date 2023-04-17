@@ -1,6 +1,5 @@
 import React from "react";
 import QuestionMark from "./QuestionMark";
-import GoogleAuth from "./GoogleAuth";
 import "./DataForScreenshot.css";
 
 function DataForScreenshot(props) {
@@ -14,7 +13,6 @@ function DataForScreenshot(props) {
             </label>
             <input className="input-api-key" type="text" id="api-key" name="api-key" placeholder="7e4650" onChange={props.onApiKeyChange} />
           </div>
-          <GoogleAuth />
         </div>
     </div>
   );
