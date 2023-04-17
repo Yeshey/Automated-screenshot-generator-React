@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DataForScreenshot from "./DataForScreenshot";
+import QuestionMark from "./QuestionMark";
 import './App.css';
 
 const CLIENT_ID = "191000969607-0cgqepb1p3act7mm5bnbqm8mcl0tafbg.apps.googleusercontent.com"
@@ -12,28 +13,38 @@ function App() {
   const [imageUrl, setImageUrl] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
-  const [links, setLinks] = useState([]);
+  const [sharedImages, setSharedImages] = useState([]);
+  const [sharedImagesUrls, setSharedImagesUrls] = useState([]);
 
-  const handleAddLink = (link) => {
-    setLinks((prevLinks) => [...prevLinks, link]);
+  const handleAddLink = (link, filename) => {
+    setSharedImages((prevLinks) => [...prevLinks, link]);
+    setSharedImagesUrls((prevLinks) => [...prevLinks, filename]);
   };
 
   const renderLinks = () => {
-    if (links.length === 0) {
+    if (sharedImages.length === 0) {
       return null;
     }
+
+    console.log(sharedImages)
+    console.log(sharedImagesUrls)
 
     return (
       <div>
         <h2>Links:</h2>
         <ul>
-          {links.map((link, index) => (
-            <li key={index}>{link}</li>
+          {sharedImagesUrls.map((url, index) => (
+            <li key={index}>
+              <a href={sharedImages[index]} target="_blank" rel="noopener noreferrer">
+                {url}
+              </a>
+            </li>
           ))}
         </ul>
       </div>
     );
   };
+
 
   function takeScreenshot() {
     const url = document.getElementById("link-input").value;
@@ -48,6 +59,8 @@ function App() {
   
     const key = apiKey;
     const apiUrl = `https://api.screenshotmachine.com?key=${key}&url=${url}&dimension=${img_dimension}&format=${img_format}`;
+
+    // asynchronous
     setImageUrl(apiUrl);
     setSiteUrl(url);
   }
@@ -67,52 +80,48 @@ function App() {
     tokenClient.requestAccessToken();
   }
 
-  function uploadImage(accessToken, folderId) {
-    console.log(siteUrl)
-    //const url = new URL(siteUrl);
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-    //const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
-    const filename = `${id}_${siteUrl}.jpg`;
-  
-    // Fetch the image data
-    fetch(imageUrl)
-      .then((response) => response.blob())
-      .then((imageBlob) => {
-        // Upload the image to the specified folder
-        const formData = new FormData();
-        formData.append("metadata", new Blob(
-          [
-            JSON.stringify({
-              "name": filename,
-              "parents": [folderId]
-            })
-          ],
-          { type: "application/json" }
-        ));
-        formData.append("file", imageBlob, filename);
-        fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id%2CwebViewLink", {
-          method: "POST",
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: formData
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Image uploaded with ID:", data.id);
-            console.log("Shareable link:", data.webViewLink);
-            handleAddLink(data.webViewLink);
-            console.log(links)
-          })
-          .catch((error) => console.error("Error uploading image:", error));
-      })
-      .catch((error) => console.error("Error fetching image:", error));
-  }
-  
-
-  
-
   useEffect(() => {
+    function uploadImage(accessToken, folderId) {
+      const url = new URL(siteUrl);
+      const name = url.hostname.replace(/\./g, "_")
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      const filename = `${id}_${name}.jpg`;
+      //const filename = `${id}_${siteUrl}.jpg`;
+    
+      // Fetch the image data
+      fetch(imageUrl)
+        .then((response) => response.blob())
+        .then((imageBlob) => {
+          // Upload the image to the specified folder
+          const formData = new FormData();
+          formData.append("metadata", new Blob(
+            [
+              JSON.stringify({
+                "name": filename,
+                "parents": [folderId]
+              })
+            ],
+            { type: "application/json" }
+          ));
+          formData.append("file", imageBlob, filename);
+          fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id%2CwebViewLink", {
+            method: "POST",
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            },
+            body: formData
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Image uploaded with ID:", data.id);
+              console.log("Shareable link:", data.webViewLink);
+              handleAddLink(data.webViewLink, name);
+            })
+            .catch((error) => console.error("Error uploading image:", error));
+        })
+        .catch((error) => console.error("Error fetching image:", error));
+    }
+
     /* global google */
     // const google = window.google; 
     
@@ -167,7 +176,7 @@ function App() {
       })
     );
 
-  }, []);
+  }, [siteUrl, imageUrl]); // meaning that this useEffedct code will only run once siteUrl and imageUrl have their values
 
   return (
     <div>
