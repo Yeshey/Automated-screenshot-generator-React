@@ -29,6 +29,39 @@ function GoogleAuth() {
     tokenClient.requestAccessToken();
   }
 
+  function uploadImage(accessToken, folderId) {
+    // Fetch the image data
+    fetch("https://api.screenshotmachine.com/?key=7e4650&url=https://ifunded.de/en/&dimension=1920x1080&format=JPG")
+      .then((response) => response.blob())
+      .then((imageBlob) => {
+        // Upload the image to the specified folder
+        const formData = new FormData();
+        formData.append("metadata", new Blob(
+          [
+            JSON.stringify({
+              "name": "ifunded-screenshot.jpg",
+              "parents": [folderId]
+            })
+          ],
+          { type: "application/json" }
+        ));
+        formData.append("file", imageBlob, "ifunded-screenshot.jpg");
+        fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: formData
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Image uploaded with ID:", data.id);
+          })
+          .catch((error) => console.error("Error uploading image:", error));
+      })
+      .catch((error) => console.error("Error fetching image:", error));
+  }
+
   useEffect(() => {
     /* global google */
     // const google = window.google; 
@@ -47,44 +80,47 @@ function GoogleAuth() {
 
     // tokenClient
     setTokenClient(
-      google.accounts.oauth2.initTokenClient({ 
+      google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
         callback: (tokenResponse) => {
           console.log(tokenResponse);
           // We now have access to a live token to use for ANY google API
           if (tokenResponse && tokenResponse.access_token) {
-            // Google Drive API, we are talking to it with HTTP
-            // Create a folder (if it doesn't exist) and upload a file to it
-            fetch("https://www.googleapis.com/drive/v3/files", {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${tokenResponse.access_token}`
-              },
-              body: JSON.stringify({
-                "name": "Automated-screenshot-generator",
-                "mimeType": "application/vnd.google-apps.folder"
+            // Check if the target folder exists
+            fetch(`https://www.googleapis.com/drive/v3/files?q=name='Automated-screenshot-generator'&mimeType='application/vnd.google-apps.folder'&access_token=${tokenResponse.access_token}`)
+              .then((response) => response.json())
+              .then((data) => {
+                let folderId = null;
+                if (data.files.length === 0) {
+                  // Folder does not exist, so create it first
+                  fetch("https://www.googleapis.com/drive/v3/files", {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${tokenResponse.access_token}`
+                    },
+                    body: JSON.stringify({
+                      "name": "Automated-screenshot-generator",
+                      "mimeType": "application/vnd.google-apps.folder"
+                    })
+                  })
+                    .then((response) => response.json())
+                    .then((data) => {
+                      folderId = data.id;
+                      console.log("Folder created with ID:", folderId);
+                      // Upload the image to the newly created folder
+                      uploadImage(tokenResponse.access_token, folderId);
+                    })
+                    .catch((error) => console.error("Error creating folder:", error));
+                } else {
+                  // Folder exists, so use its ID to upload the image
+                  folderId = data.files[0].id;
+                  console.log("Folder exists with ID:", folderId);
+                  uploadImage(tokenResponse.access_token, folderId);
+                }
               })
-            })
-            .then(response => response.json())
-            .then(folder => {
-              const folderId = folder.id;
-              console.log(`Folder ID: ${folderId}`);
-    
-              fetch("https://www.googleapis.com/drive/v3/files", {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${tokenResponse.access_token}`
-                },
-                body: JSON.stringify({
-                  "name": "Cooper Codes File",
-                  "parents": [folderId],
-                  "mimeType":"text/plain"
-                })
-              });
-            });
+              .catch((error) => console.error("Error searching for folder:", error));
           }
         }
       })
