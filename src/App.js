@@ -47,7 +47,8 @@ function App() {
 
 function uploadImage(accessToken, folderId) {
   const url = new URL(siteUrl);
-  const filename = `${url.hostname.replace(/\./g, "_")}.jpg`;
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
 
   // Fetch the image data
   fetch(imageUrl)
