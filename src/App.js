@@ -10,6 +10,7 @@ const img_format = "JPG";
 
 function App() {
   const [imageUrl, setImageUrl] = useState("");
+  const [siteUrl, setSiteUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
 
   function takeScreenshot() {
@@ -26,12 +27,12 @@ function App() {
     const key = apiKey;
     const apiUrl = `https://api.screenshotmachine.com?key=${key}&url=${url}&dimension=${img_dimension}&format=${img_format}`;
     setImageUrl(apiUrl);
+    setSiteUrl(url);
   }
 
   function handleApiKeyChange(event) {
     setApiKey(event.target.value);
   }
-
 
   const [tokenClient, setTokenClient] = useState({});
 
@@ -45,7 +46,7 @@ function App() {
   }
 
 function uploadImage(accessToken, folderId) {
-  const url = new URL(imageUrl);
+  const url = new URL(siteUrl);
   const filename = `${url.hostname.replace(/\./g, "_")}.jpg`;
 
   // Fetch the image data
