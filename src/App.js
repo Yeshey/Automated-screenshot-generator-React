@@ -26,9 +26,6 @@ function App() {
       return null;
     }
 
-    console.log(sharedImages)
-    console.log(sharedImagesUrls)
-
     return (
       <div>
         <h2>Links:</h2>
@@ -82,8 +79,19 @@ function App() {
 
   useEffect(() => {
     function uploadImage(accessToken, folderId) {
-      const url = new URL(siteUrl);
-      const name = url.hostname.replace(/\./g, "_")
+      //console.log(siteUrl)
+      //console.log(imageUrl)
+      //setImageUrl(siteUrl);
+      //setSiteUrl(imageUrl);
+
+      var url
+      var name
+      try {
+        url = new URL(siteUrl);  
+        name = url.hostname.replace(/\./g, "_")
+      } catch {
+        name = siteUrl;
+      }
       const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
       const filename = `${id}_${name}.jpg`;
       //const filename = `${id}_${siteUrl}.jpg`;
@@ -176,7 +184,7 @@ function App() {
       })
     );
 
-  }, [siteUrl, imageUrl]); // meaning that this useEffedct code will only run once siteUrl and imageUrl have their values
+  }, [siteUrl, imageUrl]); // meaning that this useEffect code will only run once siteUrl and imageUrl have their values
 
   return (
     <div>
