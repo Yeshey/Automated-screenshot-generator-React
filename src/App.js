@@ -36,7 +36,7 @@ function App() {
 
   const [tokenClient, setTokenClient] = useState({});
 
-  function createDriveFile() { 
+  function createDriveFile() {
     // Check if imageUrl state variable is empty
     if (!imageUrl) {
       alert("No screenshot taken yet");
@@ -45,42 +45,44 @@ function App() {
     tokenClient.requestAccessToken();
   }
 
-function uploadImage(accessToken, folderId) {
-  const url = new URL(siteUrl);
-  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
-
-  // Fetch the image data
-  fetch(imageUrl)
-    .then((response) => response.blob())
-    .then((imageBlob) => {
-      // Upload the image to the specified folder
-      const formData = new FormData();
-      formData.append("metadata", new Blob(
-        [
-          JSON.stringify({
-            "name": filename,
-            "parents": [folderId]
-          })
-        ],
-        { type: "application/json" }
-      ));
-      formData.append("file", imageBlob, filename);
-      fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: formData
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Image uploaded with ID:", data.id);
+  function uploadImage(accessToken, folderId) {
+    const url = new URL(siteUrl);
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const filename = `${id}_${url.hostname.replace(/\./g, "_")}.jpg`;
+  
+    // Fetch the image data
+    fetch(imageUrl)
+      .then((response) => response.blob())
+      .then((imageBlob) => {
+        // Upload the image to the specified folder
+        const formData = new FormData();
+        formData.append("metadata", new Blob(
+          [
+            JSON.stringify({
+              "name": filename,
+              "parents": [folderId]
+            })
+          ],
+          { type: "application/json" }
+        ));
+        formData.append("file", imageBlob, filename);
+        fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id%2CwebViewLink", {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: formData
         })
-        .catch((error) => console.error("Error uploading image:", error));
-    })
-    .catch((error) => console.error("Error fetching image:", error));
-}
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Image uploaded with ID:", data.id);
+            console.log("Shareable link:", data.webViewLink);
+          })
+          .catch((error) => console.error("Error uploading image:", error));
+      })
+      .catch((error) => console.error("Error fetching image:", error));
+  }
+  
 
   
 
